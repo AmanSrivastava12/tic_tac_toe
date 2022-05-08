@@ -4,43 +4,77 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Tic-tac-toe</title>
     <link rel="stylesheet" href="style.css" />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
   </head>
   <body onload="initialize()">
-    <h1>Tic-Tac-Toe</h1>
-    <table id="table_game">
-      <tr>
-        <td class="td_game">
-          <div id="cell0" onclick="cellClicked(this.id)" class="fixed"></div>
-        </td>
-        <td class="td_game">
-          <div id="cell1" onclick="cellClicked(this.id)" class="fixed"></div>
-        </td>
-        <td class="td_game">
-          <div id="cell2" onclick="cellClicked(this.id)" class="fixed"></div>
-        </td>
-      </tr>
-      <tr>
-        <td class="td_game">
-          <div id="cell3" onclick="cellClicked(this.id)" class="fixed"></div>
-        </td>
-        <td class="td_game">
-          <div id="cell4" onclick="cellClicked(this.id)" class="fixed"></div>
-        </td>
-        <td class="td_game">
-          <div id="cell5" onclick="cellClicked(this.id)" class="fixed"></div>
-        </td>
-      </tr>
-      <tr>
-        <td class="td_game">
-          <div id="cell6" onclick="cellClicked(this.id)" class="fixed"></div>
-        </td>
-        <td class="td_game">
-          <div id="cell7" onclick="cellClicked(this.id)" class="fixed"></div>
-        </td>
-        <td class="td_game">
-          <div id="cell8" onclick="cellClicked(this.id)" class="fixed"></div>
-        </td>
-      </tr>
-    </table>
+    <div class="container">
+      <h1>tic-tac-toe</h1>
+      <table id="table_game">
+        <tr>
+          <td class="td_game">
+            <div id="cell0" onclick="cellClicked(this.id)" class="fixed"></div>
+          </td>
+          <td class="td_game">
+            <div id="cell1" onclick="cellClicked(this.id)" class="fixed"></div>
+          </td>
+          <td class="td_game">
+            <div id="cell2" onclick="cellClicked(this.id)" class="fixed"></div>
+          </td>
+        </tr>
+        <tr>
+          <td class="td_game">
+            <div id="cell3" onclick="cellClicked(this.id)" class="fixed"></div>
+          </td>
+          <td class="td_game">
+            <div id="cell4" onclick="cellClicked(this.id)" class="fixed"></div>
+          </td>
+          <td class="td_game">
+            <div id="cell5" onclick="cellClicked(this.id)" class="fixed"></div>
+          </td>
+        </tr>
+        <tr>
+          <td class="td_game">
+            <div id="cell6" onclick="cellClicked(this.id)" class="fixed"></div>
+          </td>
+          <td class="td_game">
+            <div id="cell7" onclick="cellClicked(this.id)" class="fixed"></div>
+          </td>
+          <td class="td_game">
+            <div id="cell8" onclick="cellClicked(this.id)" class="fixed"></div>
+          </td>
+        </tr>
+      </table>
+      <table>
+        <tr>
+          <th class="td_list" id="computer_score">COMPUTER WINS : 0</th>
+          <th class="td_list" id="tie_score">GAME DRAWS : 0</th>
+          <th class="td_list" id="player_score">PLAYER WINS : 0</th>
+        </tr>
+      </table>
+      <div id="restart" title="Game Settings" onclick="restartGame(true)">
+        <span
+          style="
+            vertical-align: top;
+            position: relative;
+            top: 5px;
+            padding-top: 10px;
+            font-size: 30px;
+          "
+          class="material-icons"
+          >settings</span
+        >
+      </div>
+      <!-- The modal dialog for announcing the winner -->
+      <div id="winAnnounce" class="modal">
+        <!-- Modal content -->
+        <div class="modal-content">
+          <span class="close" onclick="closeModal('winAnnounce')">&times;</span>
+          <p id="winText"></p>
+        </div>
+      </div>
+    </div>
   </body>
 </html>
