@@ -1,0 +1,29 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+body {
+  background-color: rgb(125, 99, 8);
+  color: rgb(62, 19, 19);
+  text-align: center;
+  font-family: Georgia, "Times New Roman", Times, serif;
+  font-size: 0.7em;
+}
+.container {
+  background-color: rgb(172, 155, 94);
+  width: 400px;
+  height: 550px;
+  padding-top: 5px;
+  padding-right: 35px;
+  padding-bottom: 35px;
+  padding-left: 35px;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  top: 50%;
+  left: 50%;
+  box-shadow: none;
+  border-radius: 10px;
+  -webkit-perspective: 300px;
+  perspective: 300px;
+}
