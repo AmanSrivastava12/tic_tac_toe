@@ -29,3 +29,56 @@ function isInArray(element, array) {
   }
   return false;
 }
+function shuffleArray(array) {
+  var counter = array.length,
+    temp,
+    index;
+  while (counter > 0) {
+    index = Math.floor(Math.random() * counter);
+    counter--;
+    temp = array[counter];
+    array[counter] = array[index];
+    array[index] = temp;
+  }
+  return array;
+}
+
+function intRandom(min, max) {
+  var rand = min + Math.random() * (max + 1 - min);
+  return Math.floor(rand);
+}
+
+var moves = 0,
+  winner = 0,
+  x = 1,
+  o = 3,
+  player = x,
+  computer = o,
+  whoseTurn = x,
+  gameOver = false,
+  score = {
+    ties: 0,
+    player: 0,
+    computer: 0,
+  },
+  xText = '<span class="x">&times;</class>',
+  oText = '<span class="o">o</class>',
+  playerText = xText,
+  computerText = oText,
+  difficulty = 1,
+  myGrid = null;
+
+function Grid() {
+  this.cells = new Array(9);
+}
+
+Grid.prototype.getFreeCellIndices = function () {
+  var i = 0,
+    resultArray = [];
+  for (i = 0; i < this.cells.length; i++) {
+    if (this.cells[i] === 0) {
+      resultArray.push(i);
+    }
+  }
+  return resultArray;
+};
