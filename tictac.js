@@ -214,3 +214,76 @@ function assignRoles() {
   document.getElementById("yesBtn").addEventListener("click", makePlayerX);
   document.getElementById("noBtn").addEventListener("click", makePlayerO);
 }
+function makePlayerX() {
+  player = x;
+  computer = o;
+  whoseTurn = player;
+  playerText = xText;
+  computerText = oText;
+  document.getElementById("userFeedback").style.display = "none";
+  document.getElementById("yesBtn").removeEventListener("click", makePlayerX);
+  document.getElementById("noBtn").removeEventListener("click", makePlayerO);
+}
+
+function makePlayerO() {
+  player = o;
+  computer = x;
+  whoseTurn = computer;
+  playerText = oText;
+  computerText = xText;
+  setTimeout(makeComputerMove, 400);
+  document.getElementById("userFeedback").style.display = "none";
+  document.getElementById("yesBtn").removeEventListener("click", makePlayerX);
+  document.getElementById("noBtn").removeEventListener("click", makePlayerO);
+}
+
+function cellClicked(id) {
+  var idName = id.toString();
+  var cell = parseInt(idName[idName.length - 1]);
+  if (myGrid.cells[cell] > 0 || whoseTurn !== player || gameOver) {
+    return false;
+  }
+  moves += 1;
+  document.getElementById(id).innerHTML = playerText;
+  var rand = Math.random();
+  if (rand < 0.3) {
+    document.getElementById(id).style.transform = "rotate(180deg)";
+  } else if (rand > 0.6) {
+    document.getElementById(id).style.transform = "rotate(90deg)";
+  }
+  document.getElementById(id).style.cursor = "default";
+  myGrid.cells[cell] = player;
+  if (moves >= 5) {
+    winner = checkWin();
+  }
+  if (winner === 0) {
+    whoseTurn = computer;
+    makeComputerMove();
+  }
+  return true;
+}
+
+function restartGame(ask) {
+  if (moves > 0) {
+    var response = confirm("Are you sure you want to start over?");
+    if (response === false) {
+      return;
+    }
+  }
+  gameOver = false;
+  moves = 0;
+  winner = 0;
+  whoseTurn = x;
+  myGrid.reset();
+  for (var i = 0; i <= 8; i++) {
+    var id = "cell" + i.toString();
+    document.getElementById(id).innerHTML = "";
+    document.getElementById(id).style.cursor = "pointer";
+    document.getElementById(id).classList.remove("win-color");
+  }
+  if (ask === true) {
+    setTimeout(showOptions, 200);
+  } else if (whoseTurn == computer) {
+    setTimeout(makeComputerMove, 800);
+  }
+}
