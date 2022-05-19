@@ -287,3 +287,137 @@ function restartGame(ask) {
     setTimeout(makeComputerMove, 800);
   }
 }
+function makeComputerMove() {
+  if (gameOver) {
+    return false;
+  }
+  var cell = -1,
+    myArr = [],
+    corners = [0, 2, 6, 8];
+  if (moves >= 3) {
+    cell = myGrid.getFirstWithTwoInARow(computer);
+    if (cell === false) {
+      cell = myGrid.getFirstWithTwoInARow(player);
+    }
+    if (cell === false) {
+      if (myGrid.cells[4] === 0 && difficulty == 1) {
+        cell = 4;
+      } else {
+        myArr = myGrid.getFreeCellIndices();
+        cell = myArr[intRandom(0, myArr.length - 1)];
+      }
+    }
+    if (
+      moves == 3 &&
+      myGrid.cells[4] == computer &&
+      player == x &&
+      difficulty == 1
+    ) {
+      if (
+        myGrid.cells[7] == player &&
+        (myGrid.cells[0] == player || myGrid.cells[2] == player)
+      ) {
+        myArr = [6, 8];
+        cell = myArr[intRandom(0, 1)];
+      } else if (
+        myGrid.cells[5] == player &&
+        (myGrid.cells[0] == player || myGrid.cells[6] == player)
+      ) {
+        myArr = [2, 8];
+        cell = myArr[intRandom(0, 1)];
+      } else if (
+        myGrid.cells[3] == player &&
+        (myGrid.cells[2] == player || myGrid.cells[8] == player)
+      ) {
+        myArr = [0, 6];
+        cell = myArr[intRandom(0, 1)];
+      } else if (
+        myGrid.cells[1] == player &&
+        (myGrid.cells[6] == player || myGrid.cells[8] == player)
+      ) {
+        myArr = [0, 2];
+        cell = myArr[intRandom(0, 1)];
+      }
+    } else if (
+      moves == 3 &&
+      myGrid.cells[4] == player &&
+      player == x &&
+      difficulty == 1
+    ) {
+      if (myGrid.cells[2] == player && myGrid.cells[6] == computer) {
+        cell = 8;
+      } else if (myGrid.cells[0] == player && myGrid.cells[8] == computer) {
+        cell = 6;
+      } else if (myGrid.cells[8] == player && myGrid.cells[0] == computer) {
+        cell = 2;
+      } else if (myGrid.cells[6] == player && myGrid.cells[2] == computer) {
+        cell = 0;
+      }
+    }
+  } else if (moves === 1 && myGrid.cells[4] == player && difficulty == 1) {
+    cell = corners[intRandom(0, 3)];
+  } else if (
+    moves === 2 &&
+    myGrid.cells[4] == player &&
+    computer == x &&
+    difficulty == 1
+  ) {
+    if (myGrid.cells[0] == computer) {
+      cell = 8;
+    } else if (myGrid.cells[2] == computer) {
+      cell = 6;
+    } else if (myGrid.cells[6] == computer) {
+      cell = 2;
+    } else if (myGrid.cells[8] == computer) {
+      cell = 0;
+    }
+  } else if (moves === 0 && intRandom(1, 10) < 8) {
+    cell = corners[intRandom(0, 3)];
+  } else {
+    if (myGrid.cells[4] === 0 && difficulty == 1) {
+      cell = 4;
+    } else {
+      myArr = myGrid.getFreeCellIndices();
+      cell = myArr[intRandom(0, myArr.length - 1)];
+    }
+  }
+  var id = "cell" + cell.toString();
+  document.getElementById(id).innerHTML = computerText;
+  document.getElementById(id).style.cursor = "default";
+  var rand = Math.random();
+  if (rand < 0.3) {
+    document.getElementById(id).style.transform = "rotate(180deg)";
+  } else if (rand > 0.6) {
+    document.getElementById(id).style.transform = "rotate(90deg)";
+  }
+  myGrid.cells[cell] = computer;
+  moves += 1;
+  if (moves >= 5) {
+    winner = checkWin();
+  }
+  if (winner === 0 && !gameOver) {
+    whoseTurn = player;
+  }
+}
+
+function checkWin() {
+  winner = 0;
+  for (var i = 0; i <= 2; i++) {
+    var row = myGrid.getRowValues(i);
+    if (row[0] > 0 && row[0] == row[1] && row[0] == row[2]) {
+      if (row[0] == computer) {
+        score.computer++;
+        winner = computer;
+      } else {
+        score.player++;
+        winner = player;
+      }
+      var tmpAr = myGrid.getRowIndices(i);
+      for (var j = 0; j < tmpAr.length; j++) {
+        var str = "cell" + tmpAr[j];
+        document.getElementById(str).classList.add("win-color");
+      }
+      setTimeout(endGame, 1000, winner);
+      return winner;
+    }
+  }
