@@ -421,3 +421,87 @@ function checkWin() {
       return winner;
     }
   }
+
+  for (i = 0; i <= 2; i++) {
+    var col = myGrid.getColumnValues(i);
+    if (col[0] > 0 && col[0] == col[1] && col[0] == col[2]) {
+      if (col[0] == computer) {
+        score.computer++;
+        winner = computer;
+      } else {
+        score.player++;
+        winner = player;
+      }
+      var tmpAr = myGrid.getColumnIndices(i);
+      for (var j = 0; j < tmpAr.length; j++) {
+        var str = "cell" + tmpAr[j];
+        document.getElementById(str).classList.add("win-color");
+      }
+      setTimeout(endGame, 1000, winner);
+      return winner;
+    }
+  }
+
+  for (i = 0; i <= 1; i++) {
+    var diagonal = myGrid.getDiagValues(i);
+    if (
+      diagonal[0] > 0 &&
+      diagonal[0] == diagonal[1] &&
+      diagonal[0] == diagonal[2]
+    ) {
+      if (diagonal[0] == computer) {
+        score.computer++;
+        winner = computer;
+      } else {
+        score.player++;
+        winner = player;
+      }
+      var tmpAr = myGrid.getDiagIndices(i);
+      for (var j = 0; j < tmpAr.length; j++) {
+        var str = "cell" + tmpAr[j];
+        document.getElementById(str).classList.add("win-color");
+      }
+      setTimeout(endGame, 1000, winner);
+      return winner;
+    }
+  }
+
+  var myArr = myGrid.getFreeCellIndices();
+  if (myArr.length === 0) {
+    winner = 10;
+    score.ties++;
+    endGame(winner);
+    return winner;
+  }
+
+  return winner;
+}
+
+function announceWinner(text) {
+  document.getElementById("winText").innerHTML = text;
+  document.getElementById("winAnnounce").style.display = "block";
+  setTimeout(closeModal, 1400, "winAnnounce");
+}
+
+function askUser(text) {
+  document.getElementById("questionText").innerHTML = text;
+  document.getElementById("userFeedback").style.display = "block";
+}
+
+function showOptions() {
+  if (player == o) {
+    document.getElementById("rx").checked = false;
+    document.getElementById("ro").checked = true;
+  } else if (player == x) {
+    document.getElementById("rx").checked = true;
+    document.getElementById("ro").checked = false;
+  }
+  if (difficulty === 0) {
+    document.getElementById("r0").checked = true;
+    document.getElementById("r1").checked = false;
+  } else {
+    document.getElementById("r0").checked = false;
+    document.getElementById("r1").checked = true;
+  }
+  document.getElementById("optionsDlg").style.display = "block";
+}
