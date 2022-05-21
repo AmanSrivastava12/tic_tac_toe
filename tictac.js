@@ -1,4 +1,38 @@
 "use strict";
+
+/*
+
+A SIMPLE TIC-TAC-TOE GAME IN JAVASCRIPT
+
+(1) Grid layout
+
+The game grid is represented in the array Grid.cells as follows:
+
+[0] [1] [2]
+[3] [4] [5]
+[6] [7] [8]
+
+The cells (array elements) hold the following numeric values:
+0 if not occupied, 1 for player, 3 for computer.
+This allows us to quickly get an overview of the game state:
+if the sum of all the cells in a row is 9, the computer wins,
+if it is 3 and all the cells are occupied, the human player wins,
+etc.
+
+(2) Strategy of makeComputerMove()
+
+The computer first  looks for almost completed rows, columns, and
+diagonals, where there are two fields occupied either by the human
+player or by the computer itself. If the computer can win by
+completing a sequence, it does so; if it can block the player from
+winning with the next move, it does that. If none of that applies,
+it plays the center field if that's free, otherwise it selects a
+random free field. This is not a 100 % certain strategy, but the
+gameplay experience is fairly decent.
+
+*/
+
+// Bind Esc key to closing the modal dialog
 document.onkeypress = function (evt) {
   evt = evt || window.event;
   var modal = document.getElementsByClassName("modal")[0];
@@ -7,6 +41,7 @@ document.onkeypress = function (evt) {
   }
 };
 
+// When the user clicks anywhere outside of the modal dialog, close it
 window.onclick = function (evt) {
   var modal = document.getElementsByClassName("modal")[0];
   if (evt.target === modal) {
@@ -14,6 +49,9 @@ window.onclick = function (evt) {
   }
 };
 
+//==================================
+// HELPER FUNCTIONS
+//==================================
 function sumArray(array) {
   var sum = 0,
     i = 0;
@@ -29,6 +67,7 @@ function isInArray(element, array) {
   }
   return false;
 }
+
 function shuffleArray(array) {
   var counter = array.length,
     temp,
@@ -48,6 +87,7 @@ function intRandom(min, max) {
   return Math.floor(rand);
 }
 
+// GLOBAL VARIABLES
 var moves = 0,
   winner = 0,
   x = 1,
@@ -68,10 +108,23 @@ var moves = 0,
   difficulty = 1,
   myGrid = null;
 
+//==================================
+// GRID OBJECT
+//==================================
+
+// Grid constructor
+//=================
 function Grid() {
   this.cells = new Array(9);
 }
 
+// Grid methods
+//=============
+
+// Get free cells in an array.
+// Returns an array of indices in the original Grid.cells array, not the values
+// of the array elements.
+// Their values can be accessed as Grid.cells[index].
 Grid.prototype.getFreeCellIndices = function () {
   var i = 0,
     resultArray = [];
@@ -80,9 +133,13 @@ Grid.prototype.getFreeCellIndices = function () {
       resultArray.push(i);
     }
   }
+  // console.log("resultArray: " + resultArray.toString());
+  // debugger;
   return resultArray;
 };
 
+// Get a row (accepts 0, 1, or 2 as argument).
+// Returns the values of the elements.
 Grid.prototype.getRowValues = function (index) {
   if (index !== 0 && index !== 1 && index !== 2) {
     console.error("Wrong arg for getRowValues!");
@@ -92,6 +149,8 @@ Grid.prototype.getRowValues = function (index) {
   return this.cells.slice(i, i + 3);
 };
 
+// Get a row (accepts 0, 1, or 2 as argument).
+// Returns an array with the indices, not their values.
 Grid.prototype.getRowIndices = function (index) {
   if (index !== 0 && index !== 1 && index !== 2) {
     console.error("Wrong arg for getRowIndices!");
@@ -105,6 +164,7 @@ Grid.prototype.getRowIndices = function (index) {
   return row;
 };
 
+// get a column (values)
 Grid.prototype.getColumnValues = function (index) {
   if (index !== 0 && index !== 1 && index !== 2) {
     console.error("Wrong arg for getColumnValues!");
@@ -118,6 +178,7 @@ Grid.prototype.getColumnValues = function (index) {
   return column;
 };
 
+// get a column (indices)
 Grid.prototype.getColumnIndices = function (index) {
   if (index !== 0 && index !== 1 && index !== 2) {
     console.error("Wrong arg for getColumnIndices!");
@@ -131,6 +192,9 @@ Grid.prototype.getColumnIndices = function (index) {
   return column;
 };
 
+// get diagonal cells
+// arg 0: from top-left
+// arg 1: from top-right
 Grid.prototype.getDiagValues = function (arg) {
   var cells = [];
   if (arg !== 1 && arg !== 0) {
@@ -147,6 +211,10 @@ Grid.prototype.getDiagValues = function (arg) {
   }
   return cells;
 };
+
+// get diagonal cells
+// arg 0: from top-left
+// arg 1: from top-right
 Grid.prototype.getDiagIndices = function (arg) {
   if (arg !== 1 && arg !== 0) {
     console.error("Wrong arg for getDiagIndices!");
@@ -158,6 +226,7 @@ Grid.prototype.getDiagIndices = function (arg) {
   }
 };
 
+// Get first index with two in a row (accepts computer or player as argument)
 Grid.prototype.getFirstWithTwoInARow = function (agent) {
   if (agent !== computer && agent !== player) {
     console.error(
@@ -197,23 +266,32 @@ Grid.prototype.reset = function () {
   return true;
 };
 
+//==================================
+// MAIN FUNCTIONS
+//==================================
+
+// executed when the page loads
 function initialize() {
   myGrid = new Grid();
   moves = 0;
   winner = 0;
   gameOver = false;
-  whoseTurn = player;
+  whoseTurn = player; // default, this may change
   for (var i = 0; i <= myGrid.cells.length - 1; i++) {
     myGrid.cells[i] = 0;
   }
+  // setTimeout(assignRoles, 500);
   setTimeout(showOptions, 500);
+  // debugger;
 }
 
+// Ask player if they want to play as X or O. X goes first.
 function assignRoles() {
   askUser("Do you want to go first?");
   document.getElementById("yesBtn").addEventListener("click", makePlayerX);
   document.getElementById("noBtn").addEventListener("click", makePlayerO);
 }
+
 function makePlayerX() {
   player = x;
   computer = o;
@@ -237,14 +315,18 @@ function makePlayerO() {
   document.getElementById("noBtn").removeEventListener("click", makePlayerO);
 }
 
+// executed when player clicks one of the table cells
 function cellClicked(id) {
+  // The last character of the id corresponds to the numeric index in Grid.cells:
   var idName = id.toString();
   var cell = parseInt(idName[idName.length - 1]);
   if (myGrid.cells[cell] > 0 || whoseTurn !== player || gameOver) {
+    // cell is already occupied or something else is wrong
     return false;
   }
   moves += 1;
   document.getElementById(id).innerHTML = playerText;
+  // randomize orientation (for looks only)
   var rand = Math.random();
   if (rand < 0.3) {
     document.getElementById(id).style.transform = "rotate(180deg)";
@@ -253,6 +335,7 @@ function cellClicked(id) {
   }
   document.getElementById(id).style.cursor = "default";
   myGrid.cells[cell] = player;
+  // Test if we have a winner:
   if (moves >= 5) {
     winner = checkWin();
   }
@@ -263,6 +346,8 @@ function cellClicked(id) {
   return true;
 }
 
+// Executed when player hits restart button.
+// ask should be true if we should ask users if they want to play as X or O
 function restartGame(ask) {
   if (moves > 0) {
     var response = confirm("Are you sure you want to start over?");
@@ -282,12 +367,16 @@ function restartGame(ask) {
     document.getElementById(id).classList.remove("win-color");
   }
   if (ask === true) {
+    // setTimeout(assignRoles, 200);
     setTimeout(showOptions, 200);
   } else if (whoseTurn == computer) {
     setTimeout(makeComputerMove, 800);
   }
 }
+
+// The core logic of the game AI:
 function makeComputerMove() {
+  // debugger;
   if (gameOver) {
     return false;
   }
@@ -307,6 +396,7 @@ function makeComputerMove() {
         cell = myArr[intRandom(0, myArr.length - 1)];
       }
     }
+    // Avoid a catch-22 situation:
     if (
       moves == 3 &&
       myGrid.cells[4] == computer &&
@@ -355,6 +445,7 @@ function makeComputerMove() {
       }
     }
   } else if (moves === 1 && myGrid.cells[4] == player && difficulty == 1) {
+    // if player is X and played center, play one of the corners
     cell = corners[intRandom(0, 3)];
   } else if (
     moves === 2 &&
@@ -362,6 +453,7 @@ function makeComputerMove() {
     computer == x &&
     difficulty == 1
   ) {
+    // if player is O and played center, take two opposite corners
     if (myGrid.cells[0] == computer) {
       cell = 8;
     } else if (myGrid.cells[2] == computer) {
@@ -372,8 +464,10 @@ function makeComputerMove() {
       cell = 0;
     }
   } else if (moves === 0 && intRandom(1, 10) < 8) {
+    // if computer is X, start with one of the corners sometimes
     cell = corners[intRandom(0, 3)];
   } else {
+    // choose the center of the board if possible
     if (myGrid.cells[4] === 0 && difficulty == 1) {
       cell = 4;
     } else {
@@ -382,8 +476,11 @@ function makeComputerMove() {
     }
   }
   var id = "cell" + cell.toString();
+  // console.log("computer chooses " + id);
   document.getElementById(id).innerHTML = computerText;
   document.getElementById(id).style.cursor = "default";
+  // randomize rotation of marks on the board to make them look
+  // as if they were handwritten
   var rand = Math.random();
   if (rand < 0.3) {
     document.getElementById(id).style.transform = "rotate(180deg)";
@@ -400,18 +497,24 @@ function makeComputerMove() {
   }
 }
 
+// Check if the game is over and determine winner
 function checkWin() {
   winner = 0;
+
+  // rows
   for (var i = 0; i <= 2; i++) {
     var row = myGrid.getRowValues(i);
     if (row[0] > 0 && row[0] == row[1] && row[0] == row[2]) {
       if (row[0] == computer) {
         score.computer++;
         winner = computer;
+        // console.log("computer wins");
       } else {
         score.player++;
         winner = player;
+        // console.log("player wins");
       }
+      // Give the winning row/column/diagonal a different bg-color
       var tmpAr = myGrid.getRowIndices(i);
       for (var j = 0; j < tmpAr.length; j++) {
         var str = "cell" + tmpAr[j];
@@ -422,16 +525,20 @@ function checkWin() {
     }
   }
 
+  // columns
   for (i = 0; i <= 2; i++) {
     var col = myGrid.getColumnValues(i);
     if (col[0] > 0 && col[0] == col[1] && col[0] == col[2]) {
       if (col[0] == computer) {
         score.computer++;
         winner = computer;
+        // console.log("computer wins");
       } else {
         score.player++;
         winner = player;
+        // console.log("player wins");
       }
+      // Give the winning row/column/diagonal a different bg-color
       var tmpAr = myGrid.getColumnIndices(i);
       for (var j = 0; j < tmpAr.length; j++) {
         var str = "cell" + tmpAr[j];
@@ -442,6 +549,7 @@ function checkWin() {
     }
   }
 
+  // diagonals
   for (i = 0; i <= 1; i++) {
     var diagonal = myGrid.getDiagValues(i);
     if (
@@ -452,10 +560,13 @@ function checkWin() {
       if (diagonal[0] == computer) {
         score.computer++;
         winner = computer;
+        // console.log("computer wins");
       } else {
         score.player++;
         winner = player;
+        // console.log("player wins");
       }
+      // Give the winning row/column/diagonal a different bg-color
       var tmpAr = myGrid.getDiagIndices(i);
       for (var j = 0; j < tmpAr.length; j++) {
         var str = "cell" + tmpAr[j];
@@ -466,6 +577,7 @@ function checkWin() {
     }
   }
 
+  // If we haven't returned a winner by now, if the board is full, it's a tie
   var myArr = myGrid.getFreeCellIndices();
   if (myArr.length === 0) {
     winner = 10;
@@ -504,4 +616,62 @@ function showOptions() {
     document.getElementById("r1").checked = true;
   }
   document.getElementById("optionsDlg").style.display = "block";
+}
+
+function getOptions() {
+  var diffs = document.getElementsByName("difficulty");
+  for (var i = 0; i < diffs.length; i++) {
+    if (diffs[i].checked) {
+      difficulty = parseInt(diffs[i].value);
+      break;
+      // debugger;
+    }
+  }
+  if (document.getElementById("rx").checked === true) {
+    player = x;
+    computer = o;
+    whoseTurn = player;
+    playerText = xText;
+    computerText = oText;
+  } else {
+    player = o;
+    computer = x;
+    whoseTurn = computer;
+    playerText = oText;
+    computerText = xText;
+    setTimeout(makeComputerMove, 400);
+  }
+  document.getElementById("optionsDlg").style.display = "none";
+}
+
+function closeModal(id) {
+  document.getElementById(id).style.display = "none";
+}
+
+function endGame(who) {
+  if (who == player) {
+    announceWinner("Congratulations, you won!");
+  } else if (who == computer) {
+    announceWinner("Computer wins!");
+  } else {
+    announceWinner("It's a tie!");
+  }
+  gameOver = true;
+  whoseTurn = 0;
+  moves = 0;
+  winner = 0;
+  document.querySelector(
+    "#computer_score"
+  ).textContent = `COMPUTER WINS : ${score.computer}`;
+  document.querySelector(
+    "#tie_score"
+  ).textContent = ` GAME DRAWS : ${score.ties}`;
+  document.querySelector(
+    "#player_score"
+  ).textContent = `PLAYER WINS : ${score.player}`;
+  for (var i = 0; i <= 8; i++) {
+    var id = "cell" + i.toString();
+    document.getElementById(id).style.cursor = "default";
+  }
+  setTimeout(restartGame, 800);
 }
