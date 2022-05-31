@@ -1,4 +1,5 @@
 "use strict";
+
 document.onkeypress = function (evt) {
   evt = evt || window.event;
   var modal = document.getElementsByClassName("modal")[0];
@@ -29,6 +30,7 @@ function isInArray(element, array) {
   }
   return false;
 }
+
 function shuffleArray(array) {
   var counter = array.length,
     temp,
@@ -147,6 +149,7 @@ Grid.prototype.getDiagValues = function (arg) {
   }
   return cells;
 };
+
 Grid.prototype.getDiagIndices = function (arg) {
   if (arg !== 1 && arg !== 0) {
     console.error("Wrong arg for getDiagIndices!");
@@ -214,6 +217,7 @@ function assignRoles() {
   document.getElementById("yesBtn").addEventListener("click", makePlayerX);
   document.getElementById("noBtn").addEventListener("click", makePlayerO);
 }
+
 function makePlayerX() {
   player = x;
   computer = o;
@@ -287,6 +291,7 @@ function restartGame(ask) {
     setTimeout(makeComputerMove, 800);
   }
 }
+
 function makeComputerMove() {
   if (gameOver) {
     return false;
@@ -504,4 +509,61 @@ function showOptions() {
     document.getElementById("r1").checked = true;
   }
   document.getElementById("optionsDlg").style.display = "block";
+}
+
+function getOptions() {
+  var diffs = document.getElementsByName("difficulty");
+  for (var i = 0; i < diffs.length; i++) {
+    if (diffs[i].checked) {
+      difficulty = parseInt(diffs[i].value);
+      break;
+    }
+  }
+  if (document.getElementById("rx").checked === true) {
+    player = x;
+    computer = o;
+    whoseTurn = player;
+    playerText = xText;
+    computerText = oText;
+  } else {
+    player = o;
+    computer = x;
+    whoseTurn = computer;
+    playerText = oText;
+    computerText = xText;
+    setTimeout(makeComputerMove, 400);
+  }
+  document.getElementById("optionsDlg").style.display = "none";
+}
+
+function closeModal(id) {
+  document.getElementById(id).style.display = "none";
+}
+
+function endGame(who) {
+  if (who == player) {
+    announceWinner("Congratulations, you won!");
+  } else if (who == computer) {
+    announceWinner("Computer wins!");
+  } else {
+    announceWinner("It's a tie!");
+  }
+  gameOver = true;
+  whoseTurn = 0;
+  moves = 0;
+  winner = 0;
+  document.querySelector(
+    "#computer_score"
+  ).textContent = `COMPUTER WINS : ${score.computer}`;
+  document.querySelector(
+    "#tie_score"
+  ).textContent = ` GAME DRAWS : ${score.ties}`;
+  document.querySelector(
+    "#player_score"
+  ).textContent = `PLAYER WINS : ${score.player}`;
+  for (var i = 0; i <= 8; i++) {
+    var id = "cell" + i.toString();
+    document.getElementById(id).style.cursor = "default";
+  }
+  setTimeout(restartGame, 800);
 }
